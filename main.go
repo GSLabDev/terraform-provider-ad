@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/hashicorp/terraform/plugin"
-	"github.com/idmsubs/terraform-provider-ad/ad"
+	"github.com/GSLabDev/terraform-provider-ad/ad"
 )
 
 func main() {
