@@ -64,7 +64,7 @@ func testAccCheckAdComputerDestroy(n string) resource.TestCheckFunc {
 			dnOfComputer, //"cn=code1,cn=Computers,dc=terraform,dc=local", // The base dn to search
 			ldap.ScopeWholeSubtree, ldap.NeverDerefAliases, 0, 0, false,
 			"(&(objectClass=Computer)(cn="+rs.Primary.Attributes["computer_name"]+"))", // The filter to apply
-			[]string{"dn", "cn"},                                                       // A list attributes to retrieve
+			[]string{"dn", "cn"}, // A list attributes to retrieve
 			nil,
 		)
 		sr, err := client.Search(searchRequest)
@@ -106,7 +106,7 @@ func testAccCheckAdComputerExists(n string) resource.TestCheckFunc {
 			dnOfComputer, //"cn=code1,cn=Computers,dc=terraform,dc=local", // The base dn to search
 			ldap.ScopeWholeSubtree, ldap.NeverDerefAliases, 0, 0, false,
 			"(&(objectClass=Computer)(cn="+rs.Primary.Attributes["computer_name"]+"))", // The filter to apply
-			[]string{"dn", "cn"},                                                       // A list attributes to retrieve
+			[]string{"dn", "cn"}, // A list attributes to retrieve
 			nil,
 		)
 		sr, err := client.Search(searchRequest)

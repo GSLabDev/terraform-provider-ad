@@ -77,7 +77,7 @@ func resourceADComputerRead(d *schema.ResourceData, meta interface{}) error {
 		dnOfComputer, // The base dn to search
 		ldap.ScopeWholeSubtree, ldap.NeverDerefAliases, 0, 0, false,
 		"(&(objectClass=Computer)(cn="+computerName+"))", // The filter to apply
-		[]string{"dn", "cn"},                             // A list attributes to retrieve
+		[]string{"dn", "cn"}, // A list attributes to retrieve
 		nil,
 	)
 
