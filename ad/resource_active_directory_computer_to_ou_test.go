@@ -3,7 +3,6 @@ package ad
 import (
 	"fmt"
 	"os"
-	"strings"
 	"testing"
 
 	"github.com/hashicorp/terraform/helper/resource"
@@ -11,34 +10,34 @@ import (
 	"gopkg.in/ldap.v2"
 )
 
-func TestAccAdComputer_Basic(t *testing.T) {
+func TestAccAdComputerToOU_Basic(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAccPreCheck(t)
-			testAccResourceAdComputerPreCheck(t)
+			testAccResourceAdComputerToOUPreCheck(t)
 		},
 		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckAdComputerDestroy("ad_computer.test"),
+		CheckDestroy: testAccCheckAdComputerToOUDestroy("ad_computer_to_ou.test"),
 		Steps: []resource.TestStep{
 			resource.TestStep{
-				Config: testAccResourceAdComputerConfig(),
+				Config: testAccResourceAdComputerToOUConfig(),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckAdComputerExists("ad_computer.test"),
+					testAccCheckAdComputerToOUExists("ad_computer_to_ou.test"),
 					resource.TestCheckResourceAttr(
-						"ad_computer.test", "computer_name", "terraform"),
+						"ad_computer_to_ou.test", "computer_name", "terraform"),
 				),
 			},
 		},
 	})
 }
 
-func testAccResourceAdComputerPreCheck(t *testing.T) {
-	if v := os.Getenv("AD_COMPUTER_DOMAIN"); v == "" {
-		t.Fatal("AD_COMPUTER_DOMAIN must be set for acceptance tests")
+func testAccResourceAdComputerToOUPreCheck(t *testing.T) {
+	if v := os.Getenv("AD_COMPUTER_OU_DISTINGUISHED_NAME"); v == "" {
+		t.Fatal("AD_COMPUTER_OU_DISTINGUISHED_NAME must be set for acceptance tests")
 	}
 }
 
-func testAccCheckAdComputerDestroy(n string) resource.TestCheckFunc {
+func testAccCheckAdComputerToOUDestroy(n string) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 
@@ -50,21 +49,14 @@ func testAccCheckAdComputerDestroy(n string) resource.TestCheckFunc {
 			return fmt.Errorf("No AD Computer ID is set")
 		}
 		client := testAccProvider.Meta().(*ldap.Conn)
-		domain := rs.Primary.Attributes["domain"]
+		ouDistinguishedName := rs.Primary.Attributes["ou_distinguished_name"]
 		var dnOfComputer string
-		domainArr := strings.Split(domain, ".")
-		dnOfComputer = "dc=" + domainArr[0]
-		for index, item := range domainArr {
-			if index == 0 {
-				continue
-			}
-			dnOfComputer += ",dc=" + item
-		}
+		dnOfComputer = ouDistinguishedName
 		searchRequest := ldap.NewSearchRequest(
-			dnOfComputer, //"cn=code1,cn=Computers,dc=terraform,dc=local", // The base dn to search
+			dnOfComputer, //"cn=code1,ou=DevComputers,dc=terraform,dc=local", // The base dn to search
 			ldap.ScopeWholeSubtree, ldap.NeverDerefAliases, 0, 0, false,
 			"(&(objectClass=Computer)(cn="+rs.Primary.Attributes["computer_name"]+"))", // The filter to apply
-			[]string{"dn", "cn"},                                                       // A list attributes to retrieve
+			[]string{"dn", "cn"}, // A list attributes to retrieve
 			nil,
 		)
 		sr, err := client.Search(searchRequest)
@@ -80,7 +72,7 @@ func testAccCheckAdComputerDestroy(n string) resource.TestCheckFunc {
 
 }
 
-func testAccCheckAdComputerExists(n string) resource.TestCheckFunc {
+func testAccCheckAdComputerToOUExists(n string) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 
@@ -92,21 +84,14 @@ func testAccCheckAdComputerExists(n string) resource.TestCheckFunc {
 			return fmt.Errorf("No AD Computer ID is set")
 		}
 		client := testAccProvider.Meta().(*ldap.Conn)
-		domain := rs.Primary.Attributes["domain"]
+		ouDistinguishedName := rs.Primary.Attributes["ou_distinguished_name"]
 		var dnOfComputer string
-		domainArr := strings.Split(domain, ".")
-		dnOfComputer = "dc=" + domainArr[0]
-		for index, item := range domainArr {
-			if index == 0 {
-				continue
-			}
-			dnOfComputer += ",dc=" + item
-		}
+		dnOfComputer = ouDistinguishedName
 		searchRequest := ldap.NewSearchRequest(
-			dnOfComputer, //"cn=code1,cn=Computers,dc=terraform,dc=local", // The base dn to search
+			dnOfComputer, //"cn=code1,ou=DevComputers,dc=terraform,dc=local", // The base dn to search
 			ldap.ScopeWholeSubtree, ldap.NeverDerefAliases, 0, 0, false,
 			"(&(objectClass=Computer)(cn="+rs.Primary.Attributes["computer_name"]+"))", // The filter to apply
-			[]string{"dn", "cn"},                                                       // A list attributes to retrieve
+			[]string{"dn", "cn"}, // A list attributes to retrieve
 			nil,
 		)
 		sr, err := client.Search(searchRequest)
@@ -120,21 +105,22 @@ func testAccCheckAdComputerExists(n string) resource.TestCheckFunc {
 	}
 }
 
-func testAccResourceAdComputerConfig() string {
+func testAccResourceAdComputerToOUConfig() string {
 	return fmt.Sprintf(`
 provider "ad" {
   domain   = "%s"
   ip       = "%s"
   user     = "%s"
-  password = "%s"
+  password = "%s"  
 }
-resource "ad_computer" "test" {
-  domain = "%s"
+
+resource "ad_computer_to_ou" "test" {
+  ou_distinguished_name = "%s"
   computer_name = "terraform"
 }`,
 		os.Getenv("AD_DOMAIN"),
 		os.Getenv("AD_IP"),
 		os.Getenv("AD_USER"),
 		os.Getenv("AD_PASSWORD"),
-		os.Getenv("AD_COMPUTER_DOMAIN"))
+		os.Getenv("AD_COMPUTER_OU_DISTINGUISHED_NAME"))
 }

@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/hashicorp/terraform/plugin"
-	"github.com/GSLabDev/terraform-provider-ad/ad"
+       "github.com/hashicorp/terraform/plugin"
+	   "github.com/GSLabDev/terraform-provider-ad/ad"
 )
 
 func main() {
