@@ -73,7 +73,8 @@ func resourceADComputerToOURead(d *schema.ResourceData, meta interface{}) error 
 
 	sr, err := client.Search(searchRequest)
 	if err != nil {
-		log.Fatal(err)
+		log.Printf("[ERROR] Error while searching a Computer : %s ", err)
+		return fmt.Errorf("Error while searching a Computer : %s", err)
 	}
 	fmt.Println("[ERROR] Found " + strconv.Itoa(len(sr.Entries)) + " Entries")
 	for _, entry := range sr.Entries {
