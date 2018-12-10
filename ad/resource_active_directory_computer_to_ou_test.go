@@ -117,6 +117,7 @@ provider "ad" {
 resource "ad_computer_to_ou" "test" {
   ou_distinguished_name = "%s"
   computer_name = "terraform"
+  description = "terraform test"
 }`,
 		os.Getenv("AD_DOMAIN"),
 		os.Getenv("AD_IP"),

@@ -27,6 +27,12 @@ func resourceComputer() *schema.Resource {
 				Required: true,
 				ForceNew: true,
 			},
+			"description": {
+				Type:     schema.TypeString,
+				Optional: true,
+				Default: nil,
+				ForceNew: true,
+			},
 		},
 	}
 }
@@ -36,6 +42,7 @@ func resourceADComputerCreate(d *schema.ResourceData, meta interface{}) error {
 
 	computerName := d.Get("computer_name").(string)
 	domain := d.Get("domain").(string)
+	description := d.Get("description").(string)
 	var dnOfComputer string
 	dnOfComputer += "cn=" + computerName + ",cn=Computers"
 	domainArr := strings.Split(domain, ".")
@@ -46,7 +53,7 @@ func resourceADComputerCreate(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("[DEBUG] Name of the DN is : %s ", dnOfComputer)
 	log.Printf("[DEBUG] Adding the Computer to the AD : %s ", computerName)
 
-	err := addComputerToAD(computerName, dnOfComputer, client)
+	err := addComputerToAD(computerName, dnOfComputer, client, description)
 	if err != nil {
 		log.Printf("[ERROR] Error while adding a Computer to the AD : %s ", err)
 		return fmt.Errorf("Error while adding a Computer to the AD %s", err)

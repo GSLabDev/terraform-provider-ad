@@ -16,6 +16,7 @@ Provides a Active Directory computer resource to Organizational Unit. This can b
 resource "ad_computer_to_ou" "bar" {
   ou_distinguished_name = "ou=SubOU,ou=MyOU,dc=terraform,dc=com"
   computer_name         = "sampleName"
+  description           = "terraform sample server to OU"
 }
 ```
 
@@ -25,3 +26,4 @@ The following arguments are supported:
 
 * `ou_distinguished_name` - (Required) The distinguished name of the Organizational Unit of the Active Directory
 * `computer_name` - (Required) The name of a Computer to be added to Active Directory
+* `description` - (Optional) The description property of Computer Object
