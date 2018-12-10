@@ -35,6 +35,11 @@ resource "ad_computer" "foo" {
   domain        = "${var.ad_domain}"
   computer_name = "terraformSample"
 }
+# Add computer to Organizational Unit of Active Directory
+resource "ad_computer_to_ou" "bar" {
+  ou_distinguished_name        = "${var.ad_ou_dn}"
+  computer_name                = "terraformOuSample"
+}
 ```
 
 ## Argument Reference
@@ -59,6 +64,7 @@ In addition, the following environment variables are used in tests, and must be
 set to valid values for your Active Directory environment:
 
  * AD\_COMPUTER\_DOMAIN
+ * AD\_COMPUTER\_OU\_DISTINGUISHED\_NAME
 
 Once all these variables are in place, the tests can be run like this:
 

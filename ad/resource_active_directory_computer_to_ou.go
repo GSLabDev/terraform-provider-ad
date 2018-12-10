@@ -4,25 +4,24 @@ import (
 	"fmt"
 	"log"
 	"strconv"
-	"strings"
 
 	ldap "gopkg.in/ldap.v2"
 
 	"github.com/hashicorp/terraform/helper/schema"
 )
 
-func resourceComputer() *schema.Resource {
+func resourceComputerToOU() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceADComputerCreate,
-		Read:   resourceADComputerRead,
-		Delete: resourceADComputerDelete,
+		Create: resourceADComputerToOUCreate,
+		Read:   resourceADComputerToOURead,
+		Delete: resourceADComputerToOUDelete,
 		Schema: map[string]*schema.Schema{
 			"computer_name": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"domain": {
+			"ou_distinguished_name": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
@@ -31,17 +30,13 @@ func resourceComputer() *schema.Resource {
 	}
 }
 
-func resourceADComputerCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceADComputerToOUCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*ldap.Conn)
 
 	computerName := d.Get("computer_name").(string)
-	domain := d.Get("domain").(string)
+	OUDistinguishedName := d.Get("ou_distinguished_name").(string)
 	var dnOfComputer string
-	dnOfComputer += "cn=" + computerName + ",cn=Computers"
-	domainArr := strings.Split(domain, ".")
-	for _, item := range domainArr {
-		dnOfComputer += ",dc=" + item
-	}
+	dnOfComputer += "cn=" + computerName + "," + OUDistinguishedName
 
 	log.Printf("[DEBUG] Name of the DN is : %s ", dnOfComputer)
 	log.Printf("[DEBUG] Adding the Computer to the AD : %s ", computerName)
@@ -52,32 +47,27 @@ func resourceADComputerCreate(d *schema.ResourceData, meta interface{}) error {
 		return fmt.Errorf("Error while adding a Computer to the AD %s", err)
 	}
 	log.Printf("[DEBUG] Computer Added to AD successfully: %s", computerName)
-	d.SetId(domain + "/" + computerName)
+	d.SetId(OUDistinguishedName + "/" + computerName)
 	return nil
 }
 
-func resourceADComputerRead(d *schema.ResourceData, meta interface{}) error {
+func resourceADComputerToOURead(d *schema.ResourceData, meta interface{}) error {
+	log.Println("[ERROR] In Read function")
 	client := meta.(*ldap.Conn)
 
 	computerName := d.Get("computer_name").(string)
-	domain := d.Get("domain").(string)
+	OUDistinguishedName := d.Get("ou_distinguished_name").(string)
 	var dnOfComputer string
-	domainArr := strings.Split(domain, ".")
-	dnOfComputer = "dc=" + domainArr[0]
-	for index, item := range domainArr {
-		if index == 0 {
-			continue
-		}
-		dnOfComputer += ",dc=" + item
-	}
+	dnOfComputer += OUDistinguishedName
+
 	log.Printf("[DEBUG] Name of the DN is : %s ", dnOfComputer)
-	log.Printf("[DEBUG] Deleting the Computer from the AD : %s ", computerName)
+	log.Printf("[DEBUG] Searching the Computer from the AD : %s ", computerName)
 
 	searchRequest := ldap.NewSearchRequest(
 		dnOfComputer, // The base dn to search
 		ldap.ScopeWholeSubtree, ldap.NeverDerefAliases, 0, 0, false,
 		"(&(objectClass=Computer)(cn="+computerName+"))", // The filter to apply
-		[]string{"dn", "cn"},                             // A list attributes to retrieve
+		[]string{"dn", "cn"}, // A list attributes to retrieve
 		nil,
 	)
 
@@ -97,8 +87,9 @@ func resourceADComputerRead(d *schema.ResourceData, meta interface{}) error {
 	return nil
 }
 
-func resourceADComputerDelete(d *schema.ResourceData, meta interface{}) error {
-	resourceADComputerRead(d, meta)
+func resourceADComputerToOUDelete(d *schema.ResourceData, meta interface{}) error {
+	log.Println("[ERROR] Finding computer")
+	resourceADComputerToOURead(d, meta)
 	if d.Id() == "" {
 		log.Println("[ERROR] Cannot find Computer in the specified AD")
 		return fmt.Errorf("[ERROR] Cannot find Computer in the specified AD")
@@ -106,13 +97,9 @@ func resourceADComputerDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*ldap.Conn)
 
 	computerName := d.Get("computer_name").(string)
-	domain := d.Get("domain").(string)
+	OUDistinguishedName := d.Get("ou_distinguished_name").(string)
 	var dnOfComputer string
-	dnOfComputer += "cn=" + computerName + ",cn=Computers"
-	domainArr := strings.Split(domain, ".")
-	for _, item := range domainArr {
-		dnOfComputer += ",dc=" + item
-	}
+	dnOfComputer += "cn=" + computerName + "," + OUDistinguishedName
 
 	log.Printf("[DEBUG] Name of the DN is : %s ", dnOfComputer)
 	log.Printf("[DEBUG] Deleting the Computer from the AD : %s ", computerName)

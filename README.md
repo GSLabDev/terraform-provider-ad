@@ -43,6 +43,11 @@ resource "ad_computer" "foo" {
   domain        = "${var.ad_domain}"
   computer_name = "terraformSample"
 }
+# Add computer to Organizational Unit of Active Directory
+resource "ad_computer_to_ou" "bar" {
+  ou_distinguished_name        = "${var.ad_ou_dn}"
+  computer_name                = "terraformOuSample"
+}
 ```
 
 # Building The Provider
@@ -132,9 +137,13 @@ If you want to run against a specific set of tests, run `make testacc` with the
 `TESTARGS` parameter containing the run mask as per below:
 
 ```sh
-make testacc TESTARGS="-run=TestAccAdComputer"
+make testacc TESTARGS="-run=TestAccAdComputer_Basic"
+```
+OR
+```sh
+make testacc TESTARGS="-run=TestAccAdComputerToOU_Basic"
 ```
 
 This following example would run all of the acceptance tests matching
-`TestAccAdComputer`. Change this for the specific tests you want to
-run.
+`TestAccAdComputer_Basic` OR `TestAccAdComputerToOU_Basic`. Change this for the
+specific tests you want to run.
