@@ -26,6 +26,12 @@ func resourceComputerToOU() *schema.Resource {
 				Required: true,
 				ForceNew: true,
 			},
+			"description": {
+				Type:     schema.TypeString,
+				Optional: true,
+				Default: nil,
+				ForceNew: true,
+			},
 		},
 	}
 }
@@ -35,13 +41,14 @@ func resourceADComputerToOUCreate(d *schema.ResourceData, meta interface{}) erro
 
 	computerName := d.Get("computer_name").(string)
 	OUDistinguishedName := d.Get("ou_distinguished_name").(string)
+	description := d.Get("description").(string)
 	var dnOfComputer string
 	dnOfComputer += "cn=" + computerName + "," + OUDistinguishedName
 
 	log.Printf("[DEBUG] Name of the DN is : %s ", dnOfComputer)
 	log.Printf("[DEBUG] Adding the Computer to the AD : %s ", computerName)
 
-	err := addComputerToAD(computerName, dnOfComputer, client)
+	err := addComputerToAD(computerName, dnOfComputer, client, description)
 	if err != nil {
 		log.Printf("[ERROR] Error while adding a Computer to the AD : %s ", err)
 		return fmt.Errorf("Error while adding a Computer to the AD %s", err)

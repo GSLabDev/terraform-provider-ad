@@ -131,6 +131,7 @@ provider "ad" {
 resource "ad_computer" "test" {
   domain = "%s"
   computer_name = "terraform"
+  description = "terraform test"
 }`,
 		os.Getenv("AD_DOMAIN"),
 		os.Getenv("AD_IP"),

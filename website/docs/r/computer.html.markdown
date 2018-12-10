@@ -16,6 +16,7 @@ Provides a Active Directory computer resource. This can be used to create and de
 resource "ad_computer" "web" {
   domain        = "terraform.com"
   computer_name = "sampleName"
+  description   = "terraform sample server"
 }
 ```
 
@@ -25,3 +26,4 @@ The following arguments are supported:
 
 * `domain` - (Required) The domain of the Active Directory
 * `computer_name` - (Required) The name of a Computer to be added to Active Directory
+* `description` - (Optional) The description property of Computer Object
