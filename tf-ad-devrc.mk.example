@@ -21,5 +21,6 @@ export AD_PASSWORD ?= changeme
 # succeed, it's probably best to set all of these to valid values.
 export AD_COMPUTER_DOMAIN          ?= base-linux # Active Directory Domain
 export AD_COMPUTER_OU_DISTINGUISHED_NAME	?= 'ou=DevComputers,dc=base-linux'  #AD OU Distinguished name
+export AD_GROUP_OU_DISTINGUISHED_NAME ?= 'ou=DevGroups,dc=base-linux'  #AD OU Distinguished name
 
 # vi: filetype=make
