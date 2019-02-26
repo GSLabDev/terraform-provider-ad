@@ -50,6 +50,12 @@ resource "ad_computer_to_ou" "bar" {
   computer_name                = "terraformOuSample"
   description                  = "terraform sample server to OU"
 }
+# Add group to Organizational Unit of Active Directory
+resource "ad_group_to_ou" "baz" {
+  ou_distinguished_name        = "${var.ad_ou_dn}"
+  group_name                   = "terraformGroupSample"
+  description                  = "terraform sample group to OU"
+}
 ```
 
 # Building The Provider
