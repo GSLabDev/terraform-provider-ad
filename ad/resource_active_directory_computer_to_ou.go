@@ -29,7 +29,7 @@ func resourceComputerToOU() *schema.Resource {
 			"description": {
 				Type:     schema.TypeString,
 				Optional: true,
-				Default: nil,
+				Default:  nil,
 				ForceNew: true,
 			},
 		},
