@@ -28,7 +28,7 @@ official release announcement found [here][4].
 
 ## Full Provider Documentation
 
-The provider is usefull in adding computer to Active Directory.
+The provider is useful in adding computers to Active Directory.
 ### Example
 ```hcl
 # Configure the Active Directory Provider
