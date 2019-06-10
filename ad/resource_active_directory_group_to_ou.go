@@ -32,6 +32,48 @@ func resourceGroupToOU() *schema.Resource {
 				Default:  nil,
 				ForceNew: true,
 			},
+			"distribution_group": {
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Description: "Sets group type to distribution",
+				Default:     false,
+				ForceNew:    true,
+			},
+			"managed_by": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Sets managed by attribute to specified DN",
+				Default:     nil,
+				ForceNew:    true,
+			},
+			"mail_address": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Sets email address attribute for group",
+				Default:     nil,
+				ForceNew:    true,
+			},
+			"member": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Sets group membership to specified DN(s)",
+				Default:     nil,
+				ForceNew:    true,
+			},
+			"mail_nickname": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Sets mail nickname attribute",
+				Default:     nil,
+				ForceNew:    true,
+			},
+			"group_scope": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Sets group scope attribute [global, universal, domain_local]",
+				Default:     "global",
+				ForceNew:    true,
+			},
 		},
 	}
 }
@@ -42,13 +84,36 @@ func resourceADGroupToOUCreate(d *schema.ResourceData, meta interface{}) error {
 	groupName := d.Get("group_name").(string)
 	OUDistinguishedName := d.Get("ou_distinguished_name").(string)
 	description := d.Get("description").(string)
+	mailAddress := d.Get("mail_address").(string)
+	mailNickname := d.Get("mail_nickname").(string)
+	managedBy := d.Get("managed_by").(string)
+	member := d.Get("member").(string)
+	groupScope := d.Get("group_scope").(string)
+	distGroup := d.Get("distribution_group").(bool)
+
 	var dnOfGroup string
 	dnOfGroup += "cn=" + groupName + "," + OUDistinguishedName
+	var groupType string
+	var groupScopeVal int
+
+	// Compute groupType attr value based on scope and type
+	if groupScope == "universal" {
+		groupScopeVal = 8
+	} else if groupScope == "domain_local" {
+		groupScopeVal = 4
+	} else {
+		groupScopeVal = 2
+	}
+	if distGroup == true {
+		groupType = strconv.Itoa(0 + groupScopeVal)
+	} else {
+		groupType = strconv.Itoa(-2147483648 + groupScopeVal)
+	}
 
 	log.Printf("[DEBUG] Name of the DN is : %s ", dnOfGroup)
 	log.Printf("[DEBUG] Adding the Group to the AD : %s ", groupName)
 
-	err := addGroupToAD(groupName, dnOfGroup, client, description)
+	err := addGroupToAD(groupName, dnOfGroup, groupType, mailAddress, mailNickname, member, managedBy, client, description)
 	if err != nil {
 		log.Printf("[ERROR] Error while adding a Group to the AD : %s ", err)
 		return fmt.Errorf("Error while adding a Group to the AD %s", err)
