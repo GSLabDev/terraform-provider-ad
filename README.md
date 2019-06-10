@@ -63,7 +63,7 @@ resource "ad_group_to_ou" "baz" {
   group_scope                  = "global"
   # accepts [global, universal, domain_local] global set by default
 
-  # option parameters for distribution groups
+  # optional parameters for distribution groups
   distribution_group           = false
   mail_address                 = ""
   mail_nickname                = ""
