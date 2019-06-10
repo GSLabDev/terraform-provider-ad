@@ -54,7 +54,20 @@ resource "ad_computer_to_ou" "bar" {
 resource "ad_group_to_ou" "baz" {
   ou_distinguished_name        = "${var.ad_ou_dn}"
   group_name                   = "terraformGroupSample"
+  
+  # optional group params
   description                  = "terraform sample group to OU"
+  managed_by                   = ""  # Expects DN format
+  member                       = ""  # Can add a single member in DN format
+
+  group_scope                  = "global"
+  # accepts [global, universal, domain_local] global set by default
+
+  # option parameters for distribution groups
+  distribution_group           = false
+  mail_address                 = ""
+  mail_nickname                = ""
+
 }
 ```
 
