@@ -5,7 +5,8 @@ import ldap "gopkg.in/ldap.v2"
 func addComputerToAD(computerName string, dnName string, adConn *ldap.Conn, desc string) error {
 	addRequest := ldap.NewAddRequest(dnName)
 	addRequest.Attribute("objectClass", []string{"computer"})
-	addRequest.Attribute("sAMAccountName", []string{computerName})
+	addRequest.Attribute("name", []string{computerName})
+	addRequest.Attribute("sAMAccountName", []string{computerName + "$"})
 	addRequest.Attribute("userAccountControl", []string{"4096"})
 	if desc != "" {
 		addRequest.Attribute("description", []string{desc})
