@@ -3,7 +3,7 @@ package ad
 import ldap "gopkg.in/ldap.v3"
 
 func addGroupToAD(groupName string, dnName string, adConn *ldap.Conn, desc string) error {
-	addRequest := ldap.NewAddRequest(dnName)
+	addRequest := ldap.NewAddRequest(dnName, nil)
 	addRequest.Attribute("objectClass", []string{"group"})
 	addRequest.Attribute("sAMAccountName", []string{groupName})
 	if desc != "" {
