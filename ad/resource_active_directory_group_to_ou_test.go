@@ -7,7 +7,7 @@ import (
 
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
-	"gopkg.in/ldap.v2"
+	"gopkg.in/ldap.v3"
 )
 
 func TestAccAdGroupToOU_Basic(t *testing.T) {

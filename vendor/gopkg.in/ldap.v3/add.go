@@ -10,10 +10,9 @@
 package ldap
 
 import (
-	"errors"
 	"log"
 
-	"gopkg.in/asn1-ber.v1"
+	ber "github.com/go-asn1-ber/asn1-ber"
 )
 
 // Attribute represents an LDAP attribute
@@ -41,73 +40,61 @@ type AddRequest struct {
 	DN string
 	// Attributes list the attributes of the new entry
 	Attributes []Attribute
+	// Controls hold optional controls to send with the request
+	Controls []Control
 }
 
-func (a AddRequest) encode() *ber.Packet {
-	request := ber.Encode(ber.ClassApplication, ber.TypeConstructed, ApplicationAddRequest, nil, "Add Request")
-	request.AppendChild(ber.NewString(ber.ClassUniversal, ber.TypePrimitive, ber.TagOctetString, a.DN, "DN"))
+func (req *AddRequest) appendTo(envelope *ber.Packet) error {
+	pkt := ber.Encode(ber.ClassApplication, ber.TypeConstructed, ApplicationAddRequest, nil, "Add Request")
+	pkt.AppendChild(ber.NewString(ber.ClassUniversal, ber.TypePrimitive, ber.TagOctetString, req.DN, "DN"))
 	attributes := ber.Encode(ber.ClassUniversal, ber.TypeConstructed, ber.TagSequence, nil, "Attributes")
-	for _, attribute := range a.Attributes {
+	for _, attribute := range req.Attributes {
 		attributes.AppendChild(attribute.encode())
 	}
-	request.AppendChild(attributes)
-	return request
+	pkt.AppendChild(attributes)
+
+	envelope.AppendChild(pkt)
+	if len(req.Controls) > 0 {
+		envelope.AppendChild(encodeControls(req.Controls))
+	}
+
+	return nil
 }
 
 // Attribute adds an attribute with the given type and values
-func (a *AddRequest) Attribute(attrType string, attrVals []string) {
-	a.Attributes = append(a.Attributes, Attribute{Type: attrType, Vals: attrVals})
+func (req *AddRequest) Attribute(attrType string, attrVals []string) {
+	req.Attributes = append(req.Attributes, Attribute{Type: attrType, Vals: attrVals})
 }
 
 // NewAddRequest returns an AddRequest for the given DN, with no attributes
-func NewAddRequest(dn string) *AddRequest {
+func NewAddRequest(dn string, controls []Control) *AddRequest {
 	return &AddRequest{
-		DN: dn,
+		DN:       dn,
+		Controls: controls,
 	}
 
 }
 
 // Add performs the given AddRequest
 func (l *Conn) Add(addRequest *AddRequest) error {
-	packet := ber.Encode(ber.ClassUniversal, ber.TypeConstructed, ber.TagSequence, nil, "LDAP Request")
-	packet.AppendChild(ber.NewInteger(ber.ClassUniversal, ber.TypePrimitive, ber.TagInteger, l.nextMessageID(), "MessageID"))
-	packet.AppendChild(addRequest.encode())
-
-	l.Debug.PrintPacket(packet)
-
-	msgCtx, err := l.sendMessage(packet)
+	msgCtx, err := l.doRequest(addRequest)
 	if err != nil {
 		return err
 	}
 	defer l.finishMessage(msgCtx)
 
-	l.Debug.Printf("%d: waiting for response", msgCtx.id)
-	packetResponse, ok := <-msgCtx.responses
-	if !ok {
-		return NewError(ErrorNetwork, errors.New("ldap: response channel closed"))
-	}
-	packet, err = packetResponse.ReadPacket()
-	l.Debug.Printf("%d: got response %p", msgCtx.id, packet)
+	packet, err := l.readPacket(msgCtx)
 	if err != nil {
 		return err
 	}
 
-	if l.Debug {
-		if err := addLDAPDescriptions(packet); err != nil {
-			return err
-		}
-		ber.PrintPacket(packet)
-	}
-
 	if packet.Children[1].Tag == ApplicationAddResponse {
-		resultCode, resultDescription := getLDAPResultCode(packet)
-		if resultCode != 0 {
-			return NewError(resultCode, errors.New(resultDescription))
+		err := GetLDAPError(packet)
+		if err != nil {
+			return err
 		}
 	} else {
 		log.Printf("Unexpected Response: %d", packet.Children[1].Tag)
 	}
-
-	l.Debug.Printf("%d: returning", msgCtx.id)
 	return nil
 }
