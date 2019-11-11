@@ -1,7 +1,3 @@
-// Copyright 2011 The Go Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
-
 package ldap
 
 import (
@@ -12,7 +8,7 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	"gopkg.in/asn1-ber.v1"
+	"github.com/go-asn1-ber/asn1-ber"
 )
 
 // Filter choices
@@ -82,7 +78,10 @@ func CompileFilter(filter string) (*ber.Packet, error) {
 	if err != nil {
 		return nil, err
 	}
-	if pos != len(filter) {
+	switch {
+	case pos > len(filter):
+		return nil, NewError(ErrorFilterCompile, errors.New("ldap: unexpected end of filter"))
+	case pos < len(filter):
 		return nil, NewError(ErrorFilterCompile, errors.New("ldap: finished compiling filter with extra at end: "+fmt.Sprint(filter[pos:])))
 	}
 	return packet, nil

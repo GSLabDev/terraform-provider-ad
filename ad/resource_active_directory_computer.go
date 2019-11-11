@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	ldap "gopkg.in/ldap.v2"
+	ldap "gopkg.in/ldap.v3"
 
 	"github.com/hashicorp/terraform/helper/schema"
 )

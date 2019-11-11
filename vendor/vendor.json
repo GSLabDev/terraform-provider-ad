@@ -9,11 +9,11 @@
 			"revisionTime": "2017-05-11T16:59:59Z"
 		},
 		{
-			"checksumSHA1": "itYnRitfdzJjy2mZlvJ+hCJZvtY=",
-			"path": "gopkg.in/ldap.v2",
-			"revision": "8168ee085ee43257585e50c6441aadf54ecb2c9f",
-			"revisionTime": "2016-12-01T20:47:33Z"
+			"checksumSHA1": "vKQiq7vUkGDNBJjHcqDoZqfaHCk=",
+			"path": "gopkg.in/ldap.v3",
+			"revision": "3c7ebc5837612e50ae3a60b8e9933837c9193f5f",
+			"revisionTime": "2019-11-07T01:18:53Z"
 		}
 	],
-	"rootPath": "github.com/idmsubs/terraform-provider-ad"
+	"rootPath": "github.com/adlerrobert/terraform-provider-ad"
 }
