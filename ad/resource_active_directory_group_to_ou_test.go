@@ -25,6 +25,8 @@ func TestAccAdGroupToOU_Basic(t *testing.T) {
 					testAccCheckAdGroupToOUExists("ad_group_to_ou.test"),
 					resource.TestCheckResourceAttr(
 						"ad_group_to_ou.test", "group_name", "terraform"),
+					resource.TestCheckResourceAttr(
+						"ad_group_to_ou.test", "gid_number", "9001"),
 				),
 			},
 		},
@@ -90,7 +92,8 @@ func testAccCheckAdGroupToOUExists(n string) resource.TestCheckFunc {
 		searchRequest := ldap.NewSearchRequest(
 			dnOfGroup, //"cn=code1,ou=DevGroups,dc=terraform,dc=local", // The base dn to search
 			ldap.ScopeWholeSubtree, ldap.NeverDerefAliases, 0, 0, false,
-			"(&(objectClass=Group)(cn="+rs.Primary.Attributes["group_name"]+"))", // The filter to apply
+			// filter for the test group by cn and gidNumber
+			"(&(objectClass=Group)(cn="+rs.Primary.Attributes["group_name"]+")(gidNumber="+rs.Primary.Attributes["gid_number"]+"))", // The filter to apply
 			[]string{"dn", "cn"}, // A list attributes to retrieve
 			nil,
 		)
@@ -118,6 +121,7 @@ resource "ad_group_to_ou" "test" {
   ou_distinguished_name = "%s"
   group_name = "terraform"
   description = "terraform test"
+  gid_number = "9001"
 }`,
 		os.Getenv("AD_DOMAIN"),
 		os.Getenv("AD_IP"),

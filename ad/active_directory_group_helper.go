@@ -2,12 +2,15 @@ package ad
 
 import ldap "gopkg.in/ldap.v3"
 
-func addGroupToAD(groupName string, dnName string, adConn *ldap.Conn, desc string) error {
+func addGroupToAD(groupName string, dnName string, adConn *ldap.Conn, desc string, gidNumber string) error {
 	addRequest := ldap.NewAddRequest(dnName, nil)
 	addRequest.Attribute("objectClass", []string{"group"})
 	addRequest.Attribute("sAMAccountName", []string{groupName})
 	if desc != "" {
 		addRequest.Attribute("description", []string{desc})
+	}
+	if gidNumber != "" {
+		addRequest.Attribute("gidNumber", []string{gidNumber})
 	}
 	err := adConn.Add(addRequest)
 	if err != nil {

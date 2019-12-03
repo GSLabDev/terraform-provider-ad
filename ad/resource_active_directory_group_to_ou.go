@@ -32,6 +32,13 @@ func resourceGroupToOU() *schema.Resource {
 				Default:  nil,
 				ForceNew: true,
 			},
+			"gid_number": {
+				Type:        schema.TypeString,
+				Description: "Statically sets the 'gidNumber' attribute on the resultant group.",
+				Optional:    true,
+				Default:     nil,
+				ForceNew:    true,
+			},
 		},
 	}
 }
@@ -42,13 +49,14 @@ func resourceADGroupToOUCreate(d *schema.ResourceData, meta interface{}) error {
 	groupName := d.Get("group_name").(string)
 	OUDistinguishedName := d.Get("ou_distinguished_name").(string)
 	description := d.Get("description").(string)
+	gidNumber := d.Get("gid_number").(string)
 	var dnOfGroup string
 	dnOfGroup += "cn=" + groupName + "," + OUDistinguishedName
 
 	log.Printf("[DEBUG] Name of the DN is : %s ", dnOfGroup)
 	log.Printf("[DEBUG] Adding the Group to the AD : %s ", groupName)
 
-	err := addGroupToAD(groupName, dnOfGroup, client, description)
+	err := addGroupToAD(groupName, dnOfGroup, client, description, gidNumber)
 	if err != nil {
 		log.Printf("[ERROR] Error while adding a Group to the AD : %s ", err)
 		return fmt.Errorf("Error while adding a Group to the AD %s", err)
