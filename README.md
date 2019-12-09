@@ -56,6 +56,14 @@ resource "ad_group_to_ou" "baz" {
   group_name                   = "terraformGroupSample"
   description                  = "terraform sample group to OU"
 }
+# Add User to Active Directory
+resource "ad_user" "foo1"{
+    domain = "domain"
+    first_name = "firstname"
+    last_name = "lastname"
+    logon_name    =  "logonname"
+    password = "password"
+}
 ```
 
 # Building The Provider
