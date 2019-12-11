@@ -10,7 +10,7 @@ import (
 	"github.com/hashicorp/terraform/terraform"
 	"gopkg.in/ldap.v2"
 )
-
+//test function:
 func TestAccAdUser_basic(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
