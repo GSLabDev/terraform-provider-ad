@@ -8,8 +8,9 @@ import (
 
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
-	"gopkg.in/ldap.v2"
+	"gopkg.in/ldap.v3"
 )
+
 //test function:
 func TestAccAdUser_basic(t *testing.T) {
 	resource.Test(t, resource.TestCase{
@@ -34,7 +35,7 @@ func TestAccAdUser_basic(t *testing.T) {
 
 func testAccResourceAdUserPreCheck(t *testing.T) {
 	if v := os.Getenv("AD_USER_DOMAIN"); v == "" {
-		t.Fatal("AD_USER_DOMAIN must be set for acceptance tests")
+		t.Fatal("User Domain must be set for acceptance tests")
 	}
 }
 
@@ -64,7 +65,7 @@ func testAccCheckAdUserDestroy(n string) resource.TestCheckFunc {
 			dnOfUser,
 			ldap.ScopeWholeSubtree, ldap.NeverDerefAliases, 0, 0, false,
 			"(&(objectClass=User)(cn="+rs.Primary.Attributes["name"]+"))", // The filter to apply
-			[]string{"dn", "cn"},                                          // A list attributes to retrieve
+			[]string{"dn", "cn"}, // A list attributes to retrieve
 			nil,
 		)
 		sr, err := client.Search(searchRequest)
@@ -106,7 +107,7 @@ func testAccCheckAdUserExists(n string) resource.TestCheckFunc {
 			dnOfUser,
 			ldap.ScopeWholeSubtree, ldap.NeverDerefAliases, 0, 0, false,
 			"(&(objectClass=User)(cn="+rs.Primary.Attributes["name"]+"))", // The filter to apply
-			[]string{"dn", "cn"},                                          // A list attributes to retrieve
+			[]string{"dn", "cn"}, // A list attributes to retrieve
 			nil,
 		)
 		sr, err := client.Search(searchRequest)
@@ -130,7 +131,10 @@ provider "ad" {
 }
 resource "ad_user" "test" {
   domain = "%s"
-  logon_name = "terraform"
+  first_name = "first"
+  last_name = " last"
+  logon_name = "test"
+  password = "testpassword"
 }`,
 		os.Getenv("AD_DOMAIN"),
 		os.Getenv("AD_IP"),
@@ -138,3 +142,4 @@ resource "ad_user" "test" {
 		os.Getenv("AD_PASSWORD"),
 		os.Getenv("AD_USER_DOMAIN"))
 }
+
