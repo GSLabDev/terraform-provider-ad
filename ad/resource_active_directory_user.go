@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/hashicorp/terraform/helper/schema"
-	"gopkg.in/ldap.v2"
+	"gopkg.in/ldap.v3"
 )
 
 func resourceUser() *schema.Resource {
@@ -45,6 +45,7 @@ func resourceUser() *schema.Resource {
 		},
 	}
 }
+
 // function to add a user in AD:
 
 func resourceADUserCreate(d *schema.ResourceData, m interface{}) error {
@@ -58,19 +59,19 @@ func resourceADUserCreate(d *schema.ResourceData, m interface{}) error {
 	userName := firstName + " " + lastName
 	var dnOfUser string // dnOfUser: distingished names uniquely identifies an entry to AD.
 	dnOfUser += "CN=" + userName + ",CN=Users"
-	domainArr := strings.Split(domain, ".") 
+	domainArr := strings.Split(domain, ".")
 	for _, i := range domainArr {
 		dnOfUser += ",DC=" + i
 	}
 
-	log.Printf("[DEBUG] dnOfUser: %s ", dnOfUser)     
-	log.Printf("[DEBUG] Adding user : %s ", userName) 
+	log.Printf("[DEBUG] dnOfUser: %s ", dnOfUser)
+	log.Printf("[DEBUG] Adding user : %s ", userName)
 	err := addUser(userName, dnOfUser, client, upn, lastName, pass)
 	if err != nil {
-		log.Printf("[ERROR] Error while adding user: %s ", err) 
+		log.Printf("[ERROR] Error while adding user: %s ", err)
 		return fmt.Errorf("Error while adding user %s", err)
 	}
-	log.Printf("[DEBUG] User Added success: %s", userName) 
+	log.Printf("[DEBUG] User Added success: %s", userName)
 	d.SetId(domain + "/" + userName)
 	return nil
 }
@@ -100,7 +101,7 @@ func resourceADUserRead(d *schema.ResourceData, m interface{}) error {
 		ldap.ScopeWholeSubtree, ldap.NeverDerefAliases, 0, 0,
 		false,
 		"(&(objectClass=User)(cn="+userName+"))", //applied filter
-		[]string{"dnOfUser", "cn"},               
+		[]string{"dnOfUser", "cn"},
 		nil,
 	)
 
@@ -110,15 +111,15 @@ func resourceADUserRead(d *schema.ResourceData, m interface{}) error {
 		return fmt.Errorf("Error while searching  user : %s", err)
 	}
 
-	fmt.Println("[ERROR] Found " + strconv.Itoa(len(sr.Entries)) + " Entries") 
+	fmt.Println("[ERROR] Found " + strconv.Itoa(len(sr.Entries)) + " Entries")
 	for _, entry := range sr.Entries {
-		fmt.Printf("%s: %v\n", entry.DN, entry.GetAttributeValue("cn")) 
+		fmt.Printf("%s: %v\n", entry.DN, entry.GetAttributeValue("cn"))
 
 	}
 
-	if len(sr.Entries) == 0 { 
+	if len(sr.Entries) == 0 {
 		log.Println("[ERROR] user not found")
-		d.SetId("") 
+		d.SetId("")
 	}
 	return nil
 }
@@ -136,15 +137,15 @@ func resourceADUserDelete(d *schema.ResourceData, m interface{}) error {
 	lastName := d.Get("last_name").(string)
 	domain := d.Get("domain").(string)
 	userName := firstName + " " + lastName
-	var dnOfUser string 
+	var dnOfUser string
 	dnOfUser += "CN=" + userName + ",CN=Users"
-	domainArr := strings.Split(domain, ".") 
+	domainArr := strings.Split(domain, ".")
 	for _, i := range domainArr {
 		dnOfUser += ",DC=" + i
 	}
 	log.Printf("[DEBUG] dnOfUser: %s ", dnOfUser)
 	log.Printf("[DEBUG] deleting user : %s ", userName)
-	err := delUser(userName, dnOfUser, client) 
+	err := delUser(userName, dnOfUser, client)
 	if err != nil {
 		log.Printf("[ERROR] Error in deletion :%s", err)
 		return fmt.Errorf("[ERROR] Error in deletion :%s", err)
@@ -155,7 +156,7 @@ func resourceADUserDelete(d *schema.ResourceData, m interface{}) error {
 
 // Helper function for adding user:
 func addUser(userName string, dnName string, adConn *ldap.Conn, upn string, lastName string, pass string) error {
-	a := ldap.NewAddRequest(dnName) // returns a new AddRequest without attributes " with dn".
+	a := ldap.NewAddRequest(dnName, nil) // returns a new AddRequest without attributes " with dn".
 	a.Attribute("objectClass", []string{"organizationalPerson", "person", "top", "user"})
 	a.Attribute("sAMAccountName", []string{userName})
 	a.Attribute("userPrincipalName", []string{upn})
@@ -169,6 +170,7 @@ func addUser(userName string, dnName string, adConn *ldap.Conn, upn string, last
 	}
 	return nil
 }
+
 //Helper function to delete user:
 
 func delUser(userName string, dnName string, adConn *ldap.Conn) error {
