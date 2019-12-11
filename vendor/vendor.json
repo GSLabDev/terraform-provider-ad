@@ -9,17 +9,11 @@
 			"revisionTime": "2019-11-21T21:21:51Z"
 		},
 		{
-			"checksumSHA1": "xsaHqy6/sonLV6xIxTNh4FfkWbU=",
-			"path": "gopkg.in/asn1-ber.v1",
-			"revision": "379148ca0225df7a432012b8df0355c2a2063ac0",
-			"revisionTime": "2017-05-11T16:59:59Z"
-		},
-		{
 			"checksumSHA1": "vKQiq7vUkGDNBJjHcqDoZqfaHCk=",
 			"path": "gopkg.in/ldap.v3",
 			"revision": "3c7ebc5837612e50ae3a60b8e9933837c9193f5f",
 			"revisionTime": "2019-11-07T01:18:53Z"
 		}
 	],
-	"rootPath": "github.com/terraform-providers/terraform-provider-ad"
+	"rootPath": "github.com/GSLabDev/terraform-provider-ad"
 }
