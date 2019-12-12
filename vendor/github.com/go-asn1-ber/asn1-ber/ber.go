@@ -5,9 +5,14 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"math"
 	"os"
 	"reflect"
 )
+
+// MaxPacketLengthBytes specifies the maximum allowed packet size when calling ReadPacket or DecodePacket. Set to 0 for
+// no limit.
+var MaxPacketLengthBytes int64 = math.MaxInt32
 
 type Packet struct {
 	Identifier
@@ -155,6 +160,10 @@ func PrintBytes(out io.Writer, buf []byte, indent string) {
 	}
 }
 
+func WritePacket(out io.Writer, p *Packet) {
+	printPacket(out, p, 0, false)
+}
+
 func PrintPacket(p *Packet) {
 	printPacket(os.Stdout, p, 0, false)
 }
@@ -207,7 +216,7 @@ func DecodeString(data []byte) string {
 	return string(data)
 }
 
-func parseInt64(bytes []byte) (ret int64, err error) {
+func ParseInt64(bytes []byte) (ret int64, err error) {
 	if len(bytes) > 8 {
 		// We'll overflow an int64 in this case.
 		err = fmt.Errorf("integer too large")
@@ -330,6 +339,9 @@ func readPacket(reader io.Reader) (*Packet, int, error) {
 	}
 
 	// Read definite-length content
+	if MaxPacketLengthBytes > 0 && int64(length) > MaxPacketLengthBytes {
+		return nil, read, fmt.Errorf("length %d greater than maximum %d", length, MaxPacketLengthBytes)
+	}
 	content := make([]byte, length, length)
 	if length > 0 {
 		_, err := io.ReadFull(reader, content)
@@ -349,11 +361,11 @@ func readPacket(reader io.Reader) (*Packet, int, error) {
 		switch p.Tag {
 		case TagEOC:
 		case TagBoolean:
-			val, _ := parseInt64(content)
+			val, _ := ParseInt64(content)
 
 			p.Value = val != 0
 		case TagInteger:
-			p.Value, _ = parseInt64(content)
+			p.Value, _ = ParseInt64(content)
 		case TagBitString:
 		case TagOctetString:
 			// the actual string encoding is not known here
@@ -366,7 +378,7 @@ func readPacket(reader io.Reader) (*Packet, int, error) {
 		case TagExternal:
 		case TagRealFloat:
 		case TagEnumerated:
-			p.Value, _ = parseInt64(content)
+			p.Value, _ = ParseInt64(content)
 		case TagEmbeddedPDV:
 		case TagUTF8String:
 			p.Value = DecodeString(content)

@@ -3,10 +3,10 @@
 	"ignore": "test",
 	"package": [
 		{
-			"checksumSHA1": "xsaHqy6/sonLV6xIxTNh4FfkWbU=",
-			"path": "gopkg.in/asn1-ber.v1",
-			"revision": "379148ca0225df7a432012b8df0355c2a2063ac0",
-			"revisionTime": "2017-05-11T16:59:59Z"
+			"checksumSHA1": "wHbKAXHD1CbepwyvV08uHQOi/FM=",
+			"path": "github.com/go-asn1-ber/asn1-ber",
+			"revision": "29be175fc3a3b1787c008093b829fbfee40decd6",
+			"revisionTime": "2019-11-21T21:21:51Z"
 		},
 		{
 			"checksumSHA1": "vKQiq7vUkGDNBJjHcqDoZqfaHCk=",
@@ -15,5 +15,5 @@
 			"revisionTime": "2019-11-07T01:18:53Z"
 		}
 	],
-	"rootPath": "github.com/adlerrobert/terraform-provider-ad"
+	"rootPath": "github.com/GSLabDev/terraform-provider-ad"
 }
