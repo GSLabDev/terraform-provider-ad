@@ -142,4 +142,3 @@ resource "ad_user" "test" {
 		os.Getenv("AD_PASSWORD"),
 		os.Getenv("AD_USER_DOMAIN"))
 }
-
