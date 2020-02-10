@@ -181,4 +181,3 @@ func delUser(userName string, dnName string, adConn *ldap.Conn) error {
 	}
 	return nil
 }
-
