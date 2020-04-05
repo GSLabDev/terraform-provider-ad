@@ -26,7 +26,7 @@ func TestAccAdUser_basic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAdUserExists("ad_user.test"),
 					resource.TestCheckResourceAttr(
-						"ad_user.test", "logon_name", "terraform"),
+						"ad_user.test", "logon_name", "test"),
 				),
 			},
 		},
@@ -126,18 +126,20 @@ func testAccResourceAdUserConfig() string {
 provider "ad" {
   domain   = "%s"
   ip       = "%s"
+  url      = "%s"
   user     = "%s"
   password = "%s"
 }
 resource "ad_user" "test" {
   domain = "%s"
   first_name = "first"
-  last_name = " last"
+  last_name = "last"
   logon_name = "test"
   password = "testpassword"
 }`,
 		os.Getenv("AD_DOMAIN"),
 		os.Getenv("AD_IP"),
+		os.Getenv("AD_URL"),
 		os.Getenv("AD_USER"),
 		os.Getenv("AD_PASSWORD"),
 		os.Getenv("AD_USER_DOMAIN"))

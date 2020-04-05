@@ -1,10 +1,11 @@
 package ad
 
 import (
-	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/hashicorp/terraform/terraform"
 	"os"
 	"testing"
+
+	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform/terraform"
 )
 
 var testAccProviders map[string]terraform.ResourceProvider
@@ -33,7 +34,9 @@ func testAccPreCheck(t *testing.T) {
 	}
 
 	if v := os.Getenv("AD_IP"); v == "" {
-		t.Fatal("AD_IP must be set for acceptance tests")
+		if v := os.Getenv("AD_URL"); v == "" {
+			t.Fatal("AD_IP or AD_URL must be set for acceptance tests")
+		}
 	}
 
 	if v := os.Getenv("AD_USER"); v == "" {

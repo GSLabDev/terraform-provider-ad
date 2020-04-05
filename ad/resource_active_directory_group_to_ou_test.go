@@ -131,7 +131,8 @@ func testAccResourceAdGroupToOUConfig() string {
 	return fmt.Sprintf(`
 provider "ad" {
   domain   = "%s"
-  ip       = "%s"
+	ip       = "%s"
+	url      = "%s"
   user     = "%s"
   password = "%s"  
 }
@@ -144,6 +145,7 @@ resource "ad_group_to_ou" "test" {
 }`,
 		os.Getenv("AD_DOMAIN"),
 		os.Getenv("AD_IP"),
+		os.Getenv("AD_URL"),
 		os.Getenv("AD_USER"),
 		os.Getenv("AD_PASSWORD"),
 		os.Getenv("AD_GROUP_OU_DISTINGUISHED_NAME"))
@@ -153,7 +155,8 @@ func testAccResourceAdGroupToOUConfig_with_auto_gid() string {
 	return fmt.Sprintf(`
 provider "ad" {
   domain   = "%s"
-  ip       = "%s"
+	ip       = "%s"
+	url      = "%s"
   user     = "%s"
   password = "%s"  
 }
@@ -175,6 +178,7 @@ resource "ad_group_to_ou" "test" {
 }`,
 		os.Getenv("AD_DOMAIN"),
 		os.Getenv("AD_IP"),
+		os.Getenv("AD_URL"),
 		os.Getenv("AD_USER"),
 		os.Getenv("AD_PASSWORD"),
 		os.Getenv("AD_GROUP_OU_DISTINGUISHED_NAME"))

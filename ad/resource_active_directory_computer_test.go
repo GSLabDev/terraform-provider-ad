@@ -125,6 +125,7 @@ func testAccResourceAdComputerConfig() string {
 provider "ad" {
   domain   = "%s"
   ip       = "%s"
+  url      = "%s"
   user     = "%s"
   password = "%s"
 }
@@ -135,6 +136,7 @@ resource "ad_computer" "test" {
 }`,
 		os.Getenv("AD_DOMAIN"),
 		os.Getenv("AD_IP"),
+		os.Getenv("AD_URL"),
 		os.Getenv("AD_USER"),
 		os.Getenv("AD_PASSWORD"),
 		os.Getenv("AD_COMPUTER_DOMAIN"))

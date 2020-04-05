@@ -20,9 +20,16 @@ func Provider() terraform.ResourceProvider {
 
 			"ip": {
 				Type:        schema.TypeString,
-				Required:    true,
+				Optional:    true,
 				Description: "The IP of the AD Server",
 				DefaultFunc: schema.EnvDefaultFunc("AD_IP", nil),
+			},
+
+			"url": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "The LDAP URL of the AD Server",
+				DefaultFunc: schema.EnvDefaultFunc("AD_URL", nil),
 			},
 
 			"user": {
@@ -58,6 +65,7 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 	config := Config{
 		Domain:   d.Get("domain").(string),
 		IP:       d.Get("ip").(string),
+		URL:      d.Get("url").(string),
 		Username: d.Get("user").(string),
 		Password: d.Get("password").(string),
 	}
