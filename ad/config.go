@@ -22,11 +22,12 @@ func (c *Config) Client() (*ldap.Conn, error) {
 	username = c.Username + "@" + c.Domain
 
 	// stay downwards compatible
-	if c.IP != "" {
-		url = fmt.Sprintf("ldap://%s:389", c.IP)
-	} else if c.URL != "" {
+	switch {
+	case c.URL != "":
 		url = c.URL
-	} else {
+	case c.IP != "":
+		url = fmt.Sprintf("ldap://%s:389", c.IP)
+	default:
 		return nil, fmt.Errorf("Need either an IP or LDAP URL to connect to AD, check provider configuration")
 	}
 
