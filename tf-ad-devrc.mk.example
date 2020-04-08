@@ -12,7 +12,6 @@
 # else make will add the whitespace to the variable as well.
 #
 # The essentials. None of the tests will run if you don't have these.
-# export AD_IP     ?= server.ip
 export AD_URL      ?= server.url
 export AD_DOMAIN   ?= server.domain
 export AD_USER     ?= server.user
