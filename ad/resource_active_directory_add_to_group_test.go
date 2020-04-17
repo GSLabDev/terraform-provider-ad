@@ -116,6 +116,7 @@ func testAccResourceAddToGroupConfig() string {
 provider "ad" {
   domain   = "%s"
   ip       = "%s"
+  url      = "%s"
   user     = "%s"
   password = "%s"  
 }
@@ -136,6 +137,7 @@ resource "ad_add_to_group" "test" {
 }`,
 		os.Getenv("AD_DOMAIN"),
 		os.Getenv("AD_IP"),
+		os.Getenv("AD_URL"),
 		os.Getenv("AD_USER"),
 		os.Getenv("AD_PASSWORD"),
 		os.Getenv("AD_GROUP_OU_DISTINGUISHED_NAME"))
