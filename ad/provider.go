@@ -49,11 +49,12 @@ func Provider() terraform.ResourceProvider {
 		},
 
 		ResourcesMap: map[string]*schema.Resource{
-			"ad_computer":       resourceComputer(),
-			"ad_computer_to_ou": resourceComputerToOU(),
-			"ad_group_to_ou":    resourceGroupToOU(),
-			"ad_add_to_group":   resourceAddToGroup(),
-			"ad_user":           resourceUser(),
+			"ad_computer":            resourceComputer(),
+			"ad_organizational_unit": resourceOU(),
+			"ad_computer_to_ou":      resourceComputerToOU(),
+			"ad_group_to_ou":         resourceGroupToOU(),
+			"ad_add_to_group":        resourceAddToGroup(),
+			"ad_user":                resourceUser(),
 		},
 
 		ConfigureFunc: providerConfigure,
