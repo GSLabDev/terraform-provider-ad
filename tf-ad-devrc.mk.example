@@ -22,5 +22,5 @@ export AD_PASSWORD ?= changeme
 export AD_COMPUTER_DOMAIN          ?= base-linux # Active Directory Domain
 export AD_COMPUTER_OU_DISTINGUISHED_NAME	?= 'ou=DevComputers,dc=base-linux'  #AD OU Distinguished name
 export AD_GROUP_OU_DISTINGUISHED_NAME ?= 'ou=DevGroups,dc=base-linux'  #AD OU Distinguished name
-
+export AD_OU_DOMAIN             ?= "example.com" # ou domain
 # vi: filetype=make
