@@ -6,7 +6,7 @@ description: |-
   Creates Organizational Unit in active directory.
 ---
 
-# ad\_group\_to\_ou
+# ad\_organizational\_unit
 
 Creates Organizational Unit in active directory.
 
