@@ -33,36 +33,46 @@ The provider is useful in adding computers to Active Directory.
 ```hcl
 # Configure the Active Directory Provider
 provider "ad" {
-  domain         = "${var.ad_server_domain}"
-  user           = "${var.ad_server_user}"
-  password       = "${var.ad_server_password}"
-  ip             = "${var.ad_server_ip}"
+  domain         = var.ad_server_domain
+  user           = var.ad_server_user
+  password       = var.ad_server_password
+  ip             = var.ad_server_ip
 }
+
 # Add computer to Active Directory
 resource "ad_computer" "foo" {
-  domain        = "${var.ad_domain}"
+  domain        = var.ad_domain
   computer_name = "terraformSample"
   description   = "terraform sample server"
 }
+
 # Add computer to Organizational Unit of Active Directory
 resource "ad_computer_to_ou" "bar" {
-  ou_distinguished_name        = "${var.ad_ou_dn}"
+  ou_distinguished_name        = var.ad_ou_dn
   computer_name                = "terraformOuSample"
   description                  = "terraform sample server to OU"
 }
+
 # Add group to Organizational Unit of Active Directory
 resource "ad_group_to_ou" "baz" {
-  ou_distinguished_name        = "${var.ad_ou_dn}"
+  ou_distinguished_name        = var.ad_ou_dn
   group_name                   = "terraformGroupSample"
   description                  = "terraform sample group to OU"
 }
+
 # Add User to Active Directory
 resource "ad_user" "foo1"{
-    domain 	= "domain"
+    domain      ="domain"
     first_name 	= "firstname"
     last_name   = "lastname"
     logon_name  = "logonname"
     password 	= "password"
+}
+
+# Add Organizational Unit to Active Directory
+resource "ad_organizational_unit" "test" {
+  ou_name       = "eample-ou"
+  domain        = "example.com"
 }
 ```
 
