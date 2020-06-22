@@ -66,6 +66,7 @@ resource "ad_user" "foo1"{
     first_name 	= "firstname"
     last_name   = "lastname"
     logon_name  = "logonname"
+    email       = "logonname@domain"
     password 	= "password"
 }
 
