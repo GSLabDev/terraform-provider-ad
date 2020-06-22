@@ -32,6 +32,11 @@ func resourceUser() *schema.Resource {
 				Required: true,
 				ForceNew: true,
 			},
+			"email": {
+				Type:     schema.TypeString,
+				Required: true,
+				ForceNew: true,
+			},
 			"logon_name": {
 				Type:     schema.TypeString,
 				Required: true,
@@ -56,7 +61,8 @@ func resourceADUserCreate(d *schema.ResourceData, m interface{}) error {
 	domain := d.Get("domain").(string)
 	logonName := d.Get("logon_name").(string)
 	upn := logonName + "@" + domain
-	userName := firstName + " " + lastName
+	userName := logonName
+	mail := d.Get("email").(string)
 	var dnOfUser string // dnOfUser: distingished names uniquely identifies an entry to AD.
 	dnOfUser += "CN=" + userName + ",CN=Users"
 	domainArr := strings.Split(domain, ".")
@@ -66,7 +72,7 @@ func resourceADUserCreate(d *schema.ResourceData, m interface{}) error {
 
 	log.Printf("[DEBUG] dnOfUser: %s ", dnOfUser)
 	log.Printf("[DEBUG] Adding user : %s ", userName)
-	err := addUser(userName, dnOfUser, client, upn, lastName, pass)
+	err := addUser(userName, mail, dnOfUser, client, upn, firstName, lastName, pass)
 	if err != nil {
 		log.Printf("[ERROR] Error while adding user: %s ", err)
 		return fmt.Errorf("Error while adding user %s", err)
@@ -80,10 +86,8 @@ func resourceADUserCreate(d *schema.ResourceData, m interface{}) error {
 
 func resourceADUserRead(d *schema.ResourceData, m interface{}) error {
 	client := m.(*ldap.Conn)
-	firstName := d.Get("first_name").(string)
-	lastName := d.Get("last_name").(string)
 	domain := d.Get("domain").(string)
-	userName := firstName + " " + lastName
+	userName := d.Get("logon_name").(string)
 	var dnOfUser string // dnOfUser: distingished names uniquely identifies an entry to AD.
 	domainArr := strings.Split(domain, ".")
 	dnOfUser = "dc=" + domainArr[0]
@@ -133,10 +137,8 @@ func resourceADUserDelete(d *schema.ResourceData, m interface{}) error {
 		return fmt.Errorf("[ERROR] Cannot find user")
 	}
 	client := m.(*ldap.Conn)
-	firstName := d.Get("first_name").(string)
-	lastName := d.Get("last_name").(string)
 	domain := d.Get("domain").(string)
-	userName := firstName + " " + lastName
+	userName := d.Get("logon_name").(string)
 	var dnOfUser string
 	dnOfUser += "CN=" + userName + ",CN=Users"
 	domainArr := strings.Split(domain, ".")
@@ -155,12 +157,14 @@ func resourceADUserDelete(d *schema.ResourceData, m interface{}) error {
 }
 
 // Helper function for adding user:
-func addUser(userName string, dnName string, adConn *ldap.Conn, upn string, lastName string, pass string) error {
+func addUser(userName string, mail string, dnName string, adConn *ldap.Conn, upn string, firstName string, lastName string, pass string) error {
 	a := ldap.NewAddRequest(dnName, nil) // returns a new AddRequest without attributes " with dn".
 	a.Attribute("objectClass", []string{"organizationalPerson", "person", "top", "user"})
 	a.Attribute("sAMAccountName", []string{userName})
 	a.Attribute("userPrincipalName", []string{upn})
 	a.Attribute("name", []string{userName})
+	a.Attribute("mail", []string{mail})
+	a.Attribute("givenName", []string{firstName})
 	a.Attribute("sn", []string{lastName})
 	a.Attribute("userPassword", []string{pass})
 
