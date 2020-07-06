@@ -61,11 +61,11 @@ func resourceAddToGroupCreate(d *schema.ResourceData, meta interface{}) error {
 
 func resourceAddToGroupRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*ldap.Conn)
-	targetGroup := d.Get("target_group").(string)
+	targetGroup := strings.ToLower(d.Get("target_group").(string))
 	log.Printf("[DEBUG] Searching for members of %s", targetGroup)
-	splitTargetGroup := strings.Split(targetGroup, ",") // split target group by commas
+	splitTargetGroup := strings.SplitN(targetGroup, "dc", 2) // split target group
 	searchRequest := ldap.NewSearchRequest(
-		splitTargetGroup[len(splitTargetGroup)-2]+","+splitTargetGroup[len(splitTargetGroup)-1], // Make BaseDN from last two elements of split target group
+		"dc"+splitTargetGroup[1], // Make BaseDN from dc elements of split target group
 		ldap.ScopeWholeSubtree, ldap.NeverDerefAliases, 0, 0, false,
 		"(&(|(objectCategory=user)(objectCategory=group))(memberOf="+targetGroup+"))", // Find users and groups that are members of targetGroup
 		[]string{"dn"}, // A list attributes to retrieve
@@ -101,11 +101,11 @@ func resourceAddToGroupRead(d *schema.ResourceData, meta interface{}) error {
 
 func resourceAddToGroupDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*ldap.Conn)
-	targetGroup := d.Get("target_group").(string)
+	targetGroup := strings.ToLower(d.Get("target_group").(string))
 	log.Printf("[DEBUG] Searching for members of %s", targetGroup)
-	splitTargetGroup := strings.Split(targetGroup, ",") // split target group by commas
+	splitTargetGroup := strings.SplitN(targetGroup, "dc", 2) // split target group
 	searchRequest := ldap.NewSearchRequest(
-		splitTargetGroup[len(splitTargetGroup)-2]+","+splitTargetGroup[len(splitTargetGroup)-1], // Make BaseDN from last two elements of split target group
+		"dc"+splitTargetGroup[1], // Make BaseDN from dc elements of split target group
 		ldap.ScopeWholeSubtree, ldap.NeverDerefAliases, 0, 0, false,
 		"(&(|(objectCategory=user)(objectCategory=group))(memberOf="+targetGroup+"))", // Find users and groups that are members of targetGroup
 		[]string{"dn"}, // A list attributes to retrieve
