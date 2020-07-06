@@ -2,11 +2,13 @@ package ad
 
 import ldap "gopkg.in/ldap.v3"
 
-func addOU(OUname string, dnOfOU string, adConn *ldap.Conn) error {
-
+func addOU(OUname string, dnOfOU string, adConn *ldap.Conn, desc string) error {
 	addRequest := ldap.NewAddRequest(dnOfOU, nil) //returns Addrequest for the given DN,no attributes
 	addRequest.Attribute("objectClass", []string{"OrganizationalUnit"})
 	addRequest.Attribute("name", []string{OUname}) //login name
+	if desc != "" {
+		addRequest.Attribute("description", []string{desc})
+	}
 
 	err := adConn.Add(addRequest)
 	if err != nil {
