@@ -15,8 +15,9 @@ Creates Organizational Unit in active directory.
 ```hcl
 # Add Organizational Unit to Active Directory
 resource "ad_organizational_unit" "test" {
-  ou_name       = "eample-ou"
-  domain        = "example.com"
+  ou_name                 = "sample-ou"
+  ou_distinguished_name   = "OU=groups,DC=company,DC=com"
+  description             = "Managed by terraform"
 }
 ```
 
@@ -25,4 +26,5 @@ resource "ad_organizational_unit" "test" {
 The following arguments are supported:
 
 * `ou_name` - (Required) Name of organizational unit.
-* `domain` - (Required) Name of domain under which you want to place ou.
+* `ou_distinguished_name` - (Required) The distinguished name of the Organizational Unit of the Active Directory to add the ou to.
+* `description` - (Optional) Sets the description property of the resultant ou object.

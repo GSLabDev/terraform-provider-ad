@@ -33,8 +33,8 @@ func TestAccAdOU_Basic(t *testing.T) {
 }
 
 func testAccResourceAdOUPreCheck(t *testing.T) {
-	if v := os.Getenv("AD_OU_DOMAIN"); v == "" {
-		t.Fatal("AD_OU_DOMAIN must be set for acceptance tests")
+	if v := os.Getenv("AD_GROUP_OU_DISTINGUISHED_NAME"); v == "" {
+		t.Fatal("AD_GROUP_OU_DISTINGUISHED_NAME must be set for acceptance tests")
 	}
 }
 
@@ -50,16 +50,7 @@ func testAccCheckAdOUDestroy(n string) resource.TestCheckFunc {
 			return fmt.Errorf("No AD OU ID is set")
 		}
 		client := testAccProvider.Meta().(*ldap.Conn)
-		domain := rs.Primary.Attributes["domain"]
-		var dnOfOU string
-		domainArr := strings.Split(domain, ".")
-		dnOfOU = "dc=" + domainArr[0]
-		for index, item := range domainArr {
-			if index == 0 {
-				continue
-			}
-			dnOfOU += ",dc=" + item
-		}
+		dnOfOU := rs.Primary.Attributes["ou_distinguished_name"]
 		searchRequest := ldap.NewSearchRequest(
 			dnOfOU, //"cn=code1,cn=OU,dc=terraform,dc=local", // The base dn to search
 			ldap.ScopeWholeSubtree, ldap.NeverDerefAliases, 0, 0, false,
@@ -92,16 +83,7 @@ func testAccCheckAdOUExists(n string) resource.TestCheckFunc {
 			return fmt.Errorf("No AD OU ID is set")
 		}
 		client := testAccProvider.Meta().(*ldap.Conn)
-		domain := rs.Primary.Attributes["domain"]
-		var dnOfOU string
-		domainArr := strings.Split(domain, ".")
-		dnOfOU = "dc=" + domainArr[0]
-		for index, item := range domainArr {
-			if index == 0 {
-				continue
-			}
-			dnOfOU += ",dc=" + item
-		}
+		dnOfOU := rs.Primary.Attributes["ou_distinguished_name"]
 		searchRequest := ldap.NewSearchRequest(
 			dnOfOU, //"cn=code1,cn=OUs,dc=terraform,dc=local", // The base dn to search
 			ldap.ScopeWholeSubtree, ldap.NeverDerefAliases, 0, 0, false,
@@ -129,12 +111,13 @@ provider "ad" {
   password = "%s"
 }
 resource "ad_organizational_unit" "test" {
-  domain = "%s"
   ou_name = "terraform"
+  ou_distinguished_name = "%[5]s"
+  description = "terraform test"
 }`,
 		os.Getenv("AD_DOMAIN"),
 		os.Getenv("AD_IP"),
 		os.Getenv("AD_USER"),
 		os.Getenv("AD_PASSWORD"),
-		os.Getenv("AD_OU_DOMAIN"))
+		os.Getenv("AD_GROUP_OU_DISTINGUISHED_NAME"))
 }

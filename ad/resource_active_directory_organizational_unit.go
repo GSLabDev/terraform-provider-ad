@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"strconv"
-	"strings"
 
 	"github.com/hashicorp/terraform/helper/schema"
 	ldap "gopkg.in/ldap.v3"
@@ -22,10 +21,15 @@ func resourceOU() *schema.Resource {
 				Required: true,
 				ForceNew: true,
 			},
-
-			"domain": {
+			"ou_distinguished_name": {
 				Type:     schema.TypeString,
 				Required: true,
+				ForceNew: true,
+			},
+			"description": {
+				Type:     schema.TypeString,
+				Optional: true,
+				Default:  nil,
 				ForceNew: true,
 			},
 		},
@@ -35,22 +39,19 @@ func resourceOU() *schema.Resource {
 func ressourceADOUCreate(d *schema.ResourceData, m interface{}) error {
 	client := m.(*ldap.Conn) // m is our client to talk to server
 	ouName := d.Get("ou_name").(string)
-	domain := d.Get("domain").(string)
+	OUDistinguishedName := d.Get("ou_distinguished_name").(string)
+	description := d.Get("description").(string)
 	var dnOfOU string
-	dnOfOU += "OU=" + ouName //object's entire path to the root
-	domainArr := strings.Split(domain, ".")
-	for _, item := range domainArr {
-		dnOfOU += ",dc=" + item //dc =domain-component
-	}
+	dnOfOU += "OU=" + ouName + "," + OUDistinguishedName //object's entire path to the root
 	log.Printf("[DEBUG] dnOfOU: %s ", dnOfOU)
 	log.Printf("[DEBUG] Adding OU : %s ", ouName)
-	err := addOU(ouName, dnOfOU, client)
+	err := addOU(ouName, dnOfOU, client, description)
 	if err != nil {
 		log.Printf("[ERROR] Error while adding OU: %s ", err)
 		return fmt.Errorf("Error while adding OU %s", err)
 	}
 	log.Printf("[DEBUG] OU Added successfully: %s", ouName)
-	d.SetId(domain + "/" + ouName)
+	d.SetId(OUDistinguishedName + "/" + ouName)
 	return nil
 
 }
@@ -59,19 +60,10 @@ func resourceADOURead(d *schema.ResourceData, m interface{}) error {
 	client := m.(*ldap.Conn)
 
 	ouName := d.Get("ou_name").(string)
-	domain := d.Get("domain").(string)
+	OUDistinguishedName := d.Get("ou_distinguished_name").(string)
 
 	var dnOfOU string
-	dnOfOU += "OU=" + ouName + ","
-	domainArr := strings.Split(domain, ".")
-
-	dnOfOU += "dc=" + domainArr[0]
-	for index, i := range domainArr {
-		if index == 0 {
-			continue
-		}
-		dnOfOU += ",dc=" + i
-	}
+	dnOfOU += OUDistinguishedName
 
 	log.Printf("[DEBUG] Searching OU with domain: %s ", dnOfOU)
 
@@ -112,18 +104,10 @@ func resourceADOUDelete(d *schema.ResourceData, m interface{}) error {
 	client := m.(*ldap.Conn)
 
 	ouName := d.Get("ou_name").(string)
-	domain := d.Get("domain").(string)
+	OUDistinguishedName := d.Get("ou_distinguished_name").(string)
 
 	var dnOfOU string
-	dnOfOU += "OU=" + ouName + ","
-	domainArr := strings.Split(domain, ".")
-	dnOfOU += "dc=" + domainArr[0]
-	for index, i := range domainArr {
-		if index == 0 {
-			continue
-		}
-		dnOfOU += ",dc=" + i
-	}
+	dnOfOU += "OU=" + ouName + "," + OUDistinguishedName
 	log.Printf("[DEBUG] Name of the DN is : %s ", dnOfOU)
 	log.Printf("[DEBUG] Deleting the OU from the AD : %s ", ouName)
 
