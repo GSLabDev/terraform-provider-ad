@@ -52,8 +52,7 @@ func resourceAddToGroupCreate(d *schema.ResourceData, meta interface{}) error {
 		resourceId = resourceId + "|" + distinguishedNameToAdd
 		log.Printf("[DEBUG] Successfully added %s to %s.", distinguishedNameToAdd, targetGroup)
 	}
-	// remove the leading "|", not sure how to make this cleaner
-	resourceId = resourceId[1:len(resourceId)]
+	resourceId = strings.TrimPrefix(resourceId, "|")
 	d.SetId(resourceId)
 
 	return nil
@@ -88,7 +87,7 @@ func resourceAddToGroupRead(d *schema.ResourceData, meta interface{}) error {
 		distinguishedNameToRead := fmt.Sprintf("%s", distinguishedName)
 		log.Printf("[DEBUG] Checking if %s is a member.", distinguishedNameToRead)
 		for _, entry := range searchResult.Entries {
-			if entry.DN == distinguishedNameToRead {
+			if strings.EqualFold(entry.DN, distinguishedNameToRead) {
 				log.Printf("[DEBUG] found %s", distinguishedNameToRead)
 				readDns = append(readDns, distinguishedNameToRead)
 			}
@@ -129,7 +128,7 @@ func resourceAddToGroupDelete(d *schema.ResourceData, meta interface{}) error {
 	for _, distinguishedNameToRemove := range dnsToRemove {
 		log.Printf("Checking for %s in target group.", distinguishedNameToRemove)
 		for _, entry := range searchResult.Entries {
-			if entry.DN == distinguishedNameToRemove {
+			if strings.EqualFold(entry.DN, distinguishedNameToRemove) {
 				log.Printf("[DEBUG] Removing %s from %s", distinguishedNameToRemove, targetGroup)
 				// call the helper to do the work
 				err := removeFromGroup(distinguishedNameToRemove, targetGroup, client)
