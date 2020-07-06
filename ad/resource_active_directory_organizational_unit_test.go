@@ -33,8 +33,8 @@ func TestAccAdOU_Basic(t *testing.T) {
 }
 
 func testAccResourceAdOUPreCheck(t *testing.T) {
-	if v := os.Getenv("AD_GROUP_OU_DISTINGUISHED_NAME"); v == "" {
-		t.Fatal("AD_GROUP_OU_DISTINGUISHED_NAME must be set for acceptance tests")
+	if v := os.Getenv("AD_OU_DISTINGUISHED_NAME"); v == "" {
+		t.Fatal("AD_OU_DISTINGUISHED_NAME must be set for acceptance tests")
 	}
 }
 
@@ -119,5 +119,5 @@ resource "ad_organizational_unit" "test" {
 		os.Getenv("AD_IP"),
 		os.Getenv("AD_USER"),
 		os.Getenv("AD_PASSWORD"),
-		os.Getenv("AD_GROUP_OU_DISTINGUISHED_NAME"))
+		os.Getenv("AD_OU_DISTINGUISHED_NAME"))
 }
