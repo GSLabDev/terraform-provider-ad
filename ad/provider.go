@@ -57,6 +57,10 @@ func Provider() terraform.ResourceProvider {
 			"ad_user":                resourceUser(),
 		},
 
+		DataSourcesMap: map[string]*schema.Resource{
+			"ad_user": dataSourceUser(),
+		},
+
 		ConfigureFunc: providerConfigure,
 	}
 }
